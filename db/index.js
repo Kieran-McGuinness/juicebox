@@ -1,10 +1,17 @@
-// inside db/index.js
 const { Client } = require('pg'); // imports the pg module
 const { rows } = require('pg/lib/defaults');
 async function getAllUsers() {
     const { rows } = await client.query(
         `SELECT id, username, name, location, active 
       FROM users;
+    `);
+
+    return rows;
+}
+async function getAllTags() {
+    const { rows } = await client.query(
+        `SELECT * 
+      FROM tags;
     `);
 
     return rows;
@@ -40,18 +47,6 @@ async function getPostsByTagName(tagName) {
         throw error;
     }
 }
-
-// first get the user (NOTE: Remember the query returns 
-// (1) an object that contains 
-// (2) a `rows` array that (in this case) will contain 
-// (3) one object, which is our user.
-// if it doesn't exist (if there are no `rows` or `rows.length`), return null
-
-// if it does:
-// delete the 'password' key from the returned object
-// get their posts (use getPostsByUser)
-// then add the posts to the user object with key 'posts'
-// return the user object
 
 async function getAllPosts() {
     try {
@@ -108,12 +103,9 @@ async function createPost({
     }
 }
 async function updateUser(id, fields = {}) {
-    // build the set string
     const setString = Object.keys(fields).map(
         (key, index) => `"${key}"=$${index + 1}`
     ).join(', ');
-
-    // return early if this is called without fields
     if (setString.length === 0) {
         return;
     }
@@ -310,5 +302,6 @@ module.exports = {
     getUserById,
     addTagsToPost,
     createTags,
-    getPostsByTagName
+    getPostsByTagName,
+    getAllTags
 }
